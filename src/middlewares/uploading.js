@@ -1,7 +1,7 @@
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
-import multer_storage_cloudinary from "multer-storage-cloudinary";
-const { CloudinaryStorage } = multer_storage_cloudinary;
+import pkg from "multer-storage-cloudinary";
+const { CloudinaryStorage } = pkg;
 
 // Configure Cloudinary
 cloudinary.config({
@@ -11,11 +11,11 @@ cloudinary.config({
 });
 
 // Configure Multer to use Cloudinary as storage
-const storage = {
+const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   folder: "./public/temp", // Set the folder where you want to store your uploaded files
   allowedFormats: ["jpg", "png", "jpeg", "gif"],
   //   transformation: [{ width: 500, height: 500, crop: "limit" }], // Optional: add any transformations you want
-};
+});
 
 export const upload = multer({ storage: storage });

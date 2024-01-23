@@ -1,4 +1,4 @@
-import { AdmissionForm } from "../modeles/AdmissionForm.model.js";
+import { AdmissionForm } from "../models/AdmissionForm.model.js";
 import { ApiErrors } from "../utils/ApiErrors.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
@@ -19,23 +19,16 @@ const admissionSubmit = asyncHandler(async (req, res) => {
     desiredClass,
   } = req.body;
 
-  // Multer adds the 'file' object to the request
-  const file = req.file;
-
-  // Cloudinary will return the uploaded image URL in the 'secure_url' field
-  const imageUrl = file.secure_url;
-  console.log(imageUrl);
+  console.log(req.files);
 
   //get the url of the file which is locally saved by multer
-  // const previousClassMarkscard = req.file.filename;
+  const previousClassMarkscard = req.files.filename;
   // if (!previousClassMarkscard) throw new ApiErrors(400, "No files added");
 
   //upload the file to cloudinary
-  // const marksCard = await uploadOnCloudinary(
-  //   "http://localhost:8000/temp/IMG_20230913_112156.jpg"
-  // );
-  // const marksCard = await uploadOnCloudinary(previousClassMarkscard);
-  // if (!marksCard) throw new ApiErrors(400, "No files added");
+
+  const marksCard = await uploadOnCloudinary(previousClassMarkscard);
+  if (!marksCard) throw new ApiErrors(400, "No files added");
 
   // add the form in db
   const admissionForm = new AdmissionForm({

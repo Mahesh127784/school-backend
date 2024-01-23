@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { User } from "../modeles/user.model.js";
-import { Student } from "../modeles/students.model.js";
-import { Teacher } from "../modeles/teacher.model.js";
+import { User } from "../models/user.model.js";
+import { Student } from "../models/students.model.js";
+import { Teacher } from "../models/teacher.model.js";
 import { ApiErrors } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";

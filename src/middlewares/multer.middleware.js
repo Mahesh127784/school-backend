@@ -7,13 +7,10 @@ const storage = multer.diskStorage({
     //uploade files are saves here in upload folder
     cb(null, "./public/temp");
   },
-  // filename: function (req, file, cb) {
-  //   //naming the uploaded files in local file folder
-  //   const uniqueFilename = uuidv4();
-  //   cb(null, uniqueFilename + path.extname(file.originalname));
   filename: function (req, file, cb) {
     //naming the uploaded files in local file folder
-    cb(null, file.originalname);
+    const uniqueFilename = uuidv4();
+    cb(null, uniqueFilename + path.extname(file.originalname));
   },
 });
 
