@@ -1,19 +1,54 @@
 import { body, validationResult } from "express-validator";
 import { ApiErrors } from "../utils/ApiErrors.js";
 
+// condition for new admin data
+const validateNewAdminData = [
+  body("adminName", "Enter a valid name").isLength({ min: 3 }),
+  body("adminCode", "Enter a valid adminCode").isNumeric().isInt(),
+  body("email", "Enter a valid email").isEmail(),
+  body(
+    "password",
+    "Enter a strong password of at least 8 - 15 characters"
+  ).isLength({ min: 8, max: 15 }),
+];
+// condition for login admin data
+const validateLoginAdminData = [
+  body("adminCode", "Enter a valid adminCode").isNumeric().isInt(),
+  body("email", "Enter a valid email").isEmail(),
+  body("password", "password cannot be blank").exists(),
+];
+
 //adding the condition/type to the input fields for registration
 const validateRegisteringUser = [
   body("name", "Enter a valid name").isLength({ min: 3 }),
   body("email", "Enter a valid email").isEmail(),
-  body("password", "Enter a strong password of at least 8 characters").isLength(
-    { min: 8 }
-  ),
+  body(
+    "password",
+    "Enter a strong password of at least 8 - 15 characters"
+  ).isLength({ min: 8, max: 15 }),
 ];
 
 //adding the condition/type to the input fields for login
 const validateLoggingUser = [
   body("email", "Enter a valid email").isEmail(),
   body("password", "password cannot be blank").exists(),
+];
+
+//condition for new students entry
+const validateNewTeacherData = [
+  body("teacherName", "Enter a valid teacher name").isLength({ min: 3 }),
+  body("teacherId", "Enter a valid teacherId").isNumeric().isInt(),
+  body("subject", "Enter a valid subject name").exists(),
+  body("contactNumber", "Enter a valid contact number").isMobilePhone(),
+];
+
+//condition for new students entry
+const validateNewStudentData = [
+  body("studentName", "Enter a valid student name").isLength({ min: 3 }),
+  body("Class", "Enter a valid student class").isNumeric().isInt(),
+  body("studentId", "Enter a valid studentId").isNumeric().isInt(),
+  body("DOB", "Enter a valid date of birth").isDate(),
+  body("parentContact", "Enter a valid contact number").isMobilePhone(),
 ];
 
 //adding the conditions for admission form filling
@@ -52,7 +87,11 @@ const handleValidationErrors = (req, res, next) => {
 };
 
 export {
+  validateNewAdminData,
+  validateLoginAdminData,
   validateRegisteringUser,
+  validateNewStudentData,
+  validateNewTeacherData,
   validateLoggingUser,
   validateAdmissionForm,
   handleValidationErrors,

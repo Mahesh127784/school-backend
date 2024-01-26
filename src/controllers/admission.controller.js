@@ -2,6 +2,7 @@ import { AdmissionForm } from "../models/AdmissionForm.model.js";
 import { ApiErrors } from "../utils/ApiErrors.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
 const admissionSubmit = asyncHandler(async (req, res) => {
   //get the details from req
@@ -19,14 +20,12 @@ const admissionSubmit = asyncHandler(async (req, res) => {
     desiredClass,
   } = req.body;
 
-  console.log(req.files);
-
   //get the url of the file which is locally saved by multer
-  const previousClassMarkscard = req.files.filename;
-  // if (!previousClassMarkscard) throw new ApiErrors(400, "No files added");
+  const file = req.file;
+  const previousClassMarkscard = `./public/temp/${file.filename}`;
+  if (!previousClassMarkscard) throw new ApiErrors(400, "No files added");
 
   //upload the file to cloudinary
-
   const marksCard = await uploadOnCloudinary(previousClassMarkscard);
   if (!marksCard) throw new ApiErrors(400, "No files added");
 
@@ -43,7 +42,7 @@ const admissionSubmit = asyncHandler(async (req, res) => {
     previousSchool: previousSchool || "",
     previousClass: previousClass || "",
     desiredClass,
-    previousClassMarkscard: imageUrl,
+    previousClassMarkscard: marksCard.secure_url,
   });
   await admissionForm.save();
 
@@ -59,7 +58,11 @@ const admissionSubmit = asyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(
-      new ApiResponse(201, createdForm, "Application submited successfully")
+      new ApiResponse(
+        201,
+        createdForm,
+        "Your application submited successfully"
+      )
     );
 });
 

@@ -4,26 +4,7 @@ import { Student } from "../models/students.model.js";
 import { Teacher } from "../models/teacher.model.js";
 import { ApiErrors } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import jwt from "jsonwebtoken";
-
-// AccessAndRefreshTokenGenerator
-const AccessAndRefreshTokenGenerator = async (id) => {
-  try {
-    const user = await User.findById(id);
-    const accessToken = await user.generateAccessToken();
-    const refreshToken = await user.generateRefreshToken();
-
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
-
-    return { accessToken, refreshToken };
-  } catch (error) {
-    throw new ApiErrors(
-      500,
-      "Something went wrong while generating referesh and access token"
-    );
-  }
-};
+import { AccessAndRefreshTokenGenerator } from "../utils/access&refreshtokens.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   //   get user datails from frontEnd
@@ -89,8 +70,9 @@ const loginUser = asyncHandler(async (req, res, next) => {
       "Invalid email or password,Please login with proper credentials"
     );
 
+  //get the access and refresh tokens
   const { accessToken, refreshToken } = await AccessAndRefreshTokenGenerator(
-    user._id
+    user
   );
 
   // prepare updatedUser data to send as Response
@@ -137,45 +119,41 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out"));
 });
 
-const tokensRenewer = asyncHandler(async (req, res) => {
-  // get the refreshToken from the user
-  const usersRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  // get the passwords from user
+  const { oldPassword, newPassword } = req.body;
 
-  if (!usersRefreshToken) throw new ApiErrors(401, "unautherized request");
-
-  //verify the user by jwt and get the user from db
-  const decodedToken = jwt.verify(
-    usersRefreshToken,
-    process.env.REFRESH_TOKEN_SECRET
-  );
-
-  const user = await User.findById(decodedToken?._id);
-
-  if (!user) throw new ApiErrors(401, "Invalid refresh token");
-  if (usersRefreshToken !== user?.refreshToken)
-    throw new ApiErrors(401, "Refresh token is expired or been used");
-
-  //create new tokens as the user is autherized
-  const { accessToken, refreshToken } = await AccessAndRefreshTokenGenerator(
-    user._id
-  );
-
-  const options = {
-    httpOnly: true,
-    security: true,
-  };
-
-  return res
-    .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
-    .json(
-      new ApiResponse(
-        200,
-        { accessToken, refreshToken },
-        "Access token refreshed"
-      )
+  if (newPassword.length < 8 && newPassword.length > 15)
+    throw new ApiErrors(
+      400,
+      "Enter a strong password of at least 8 - 15 characters"
     );
+
+  // find the loggedin user data
+  const user = await User.findById(req.user?._id);
+
+  const checkOldPassword = await user.isPasswordCorrect(oldPassword);
+
+  if (!checkOldPassword) throw new ApiErrors(400, "Invalid pasword");
+
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, {}, "password changed succesfully"));
 });
 
-export { registerUser, loginUser, logoutUser, tokensRenewer };
+const getCurrentUser = asyncHandler((req, res) => {
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "Current user fetched successfully"));
+});
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  changeCurrentPassword,
+  getCurrentUser,
+};

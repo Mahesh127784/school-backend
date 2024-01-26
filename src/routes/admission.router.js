@@ -11,7 +11,7 @@ const router = Router();
 router
   .route("/admission-form")
   .post(
-    upload.any(),
+    upload.single("file"),
     validateAdmissionForm,
     handleValidationErrors,
     admissionSubmit

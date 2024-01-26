@@ -1,10 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
-import { jwt } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 const adminSchema = new Schema(
   {
-    name: {
+    adminName: {
       type: String,
       required: true,
       index: true,
@@ -13,9 +13,17 @@ const adminSchema = new Schema(
       type: Number,
       required: true,
     },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     password: {
       type: String,
       required: true,
+    },
+    refreshToken: {
+      type: String,
     },
   },
   {
@@ -23,8 +31,8 @@ const adminSchema = new Schema(
   }
 );
 
-//creating a salt password to original password and Hashing/encrypting password before saving in BD for safety
-userSchema.pre("save", async function (next) {
+//creating a salt password to original password and Hashing/encrypting password before saving in DB for safety
+adminSchema.pre("save", async function (next) {
   if (!this.isModified("password")) next();
 
   const salt = await bcrypt.genSalt(10);
@@ -32,19 +40,26 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.methods.generateAccessToken = function () {
+// when admin login, check the password by this method
+adminSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
+
+//add a accesstoken and refresh token generator method to The model to run when user want to login and logout
+
+adminSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
-      adminCode: this.adminCode,
-      name: this.name,
+      email: this.email,
+      adminName: this.adminName,
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
   );
 };
 
-userSchema.methods.generaterefreshToken = function () {
+adminSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
       _id: this._id,

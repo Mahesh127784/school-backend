@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const teacherSchema = new Schema(
   {
-    name: {
+    teacherName: {
       type: String,
       required: true,
       index: true,

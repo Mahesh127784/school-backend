@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const studentSchema = new Schema(
   {
-    name: {
+    studentName: {
       type: String,
       required: true,
       index: true,
@@ -12,16 +12,16 @@ const studentSchema = new Schema(
       required: true,
       index: true,
     },
-    class: {
+    Class: {
       type: String,
       required: true,
       index: true,
     },
     DOB: {
-      type: Number,
+      type: Date,
       required: true,
     },
-    contactNumber: {
+    parentContact: {
       type: Number,
       required: true,
     },
