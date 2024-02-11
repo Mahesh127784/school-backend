@@ -4,7 +4,8 @@ import { ApiErrors } from "../utils/ApiErrors.js";
 // condition for new admin data
 const validateNewAdminData = [
   body("adminName", "Enter a valid name").isLength({ min: 3 }),
-  body("adminCode", "Enter a valid adminCode").isNumeric().isInt(),
+  body("adminCode", "Enter a valid admin code").isNumeric().isInt(),
+  body("work", "Enter the admins role in the school").exists(),
   body("email", "Enter a valid email").isEmail(),
   body(
     "password",
@@ -13,7 +14,7 @@ const validateNewAdminData = [
 ];
 // condition for login admin data
 const validateLoginAdminData = [
-  body("adminCode", "Enter a valid adminCode").isNumeric().isInt(),
+  body("userId", "Enter a valid adminCode").isNumeric().isInt(),
   body("email", "Enter a valid email").isEmail(),
   body("password", "password cannot be blank").exists(),
 ];
@@ -36,19 +37,23 @@ const validateLoggingUser = [
 
 //condition for new students entry
 const validateNewTeacherData = [
-  body("teacherName", "Enter a valid teacher name").isLength({ min: 3 }),
-  body("teacherId", "Enter a valid teacherId").isNumeric().isInt(),
+  body("userName", "Enter a valid teacher name").isLength({ min: 3 }),
+  body("userId", "Enter a valid teacherId").isNumeric().isInt(),
   body("subject", "Enter a valid subject name").exists(),
-  body("contactNumber", "Enter a valid contact number").isMobilePhone(),
+  body("contact", "Enter a valid contact number")
+    .isMobilePhone()
+    .isLength({ min: 10, max: 10 }),
 ];
 
 //condition for new students entry
 const validateNewStudentData = [
-  body("studentName", "Enter a valid student name").isLength({ min: 3 }),
+  body("userName", "Enter a valid student name").isLength({ min: 3 }),
   body("Class", "Enter a valid student class").isNumeric().isInt(),
-  body("studentId", "Enter a valid studentId").isNumeric().isInt(),
+  body("userId", "Enter a valid studentId").isNumeric().isInt(),
   body("DOB", "Enter a valid date of birth").isDate(),
-  body("parentContact", "Enter a valid contact number").isMobilePhone(),
+  body("contact", "Enter a valid contact number")
+    .isMobilePhone()
+    .isLength({ min: 10, max: 10 }),
 ];
 
 //adding the conditions for admission form filling
@@ -57,13 +62,14 @@ const validateAdmissionForm = [
   body("DOB", "Enter a valid date of birth").isDate(),
   body("gender", "Select a valid gender").isIn(["Male", "Female", "Other"]),
   body("address", "Enter a valid address").isLength({ min: 5 }),
-  body("contactNumber", "Enter a valid contact number").isMobilePhone(),
+  body("contactNumber", "Enter a valid contact number")
+    .isMobilePhone()
+    .isLength({ min: 10, max: 10 }),
   body("email", "Enter a valid email").isEmail(),
   body("guardianName", "Enter a valid guardian name").isLength({ min: 3 }),
-  body(
-    "guardianContact",
-    "Enter a valid guardian contact number"
-  ).isMobilePhone(),
+  body("guardianContact", "Enter a valid guardian contact number")
+    .isMobilePhone()
+    .isLength({ min: 10, max: 10 }),
   body("previousSchool", "Enter a valid previous school name")
     .optional()
     .isLength({ min: 3 }),

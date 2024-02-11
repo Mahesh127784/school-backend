@@ -5,10 +5,10 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const newTeacher = asyncHandler(async (req, res) => {
   // get data from req
-  const { teacherName, teacherId, subject, contactNumber } = req.body;
+  const { userName, userId, subject, contact } = req.body;
 
   //   check for teacher id availability
-  const checkId = await Teacher.findOne({ teacherId });
+  const checkId = await Teacher.findOne({ teacherId: userId });
 
   if (checkId)
     throw new ApiErrors(
@@ -18,13 +18,13 @@ const newTeacher = asyncHandler(async (req, res) => {
 
   //add teachers data in db
   await Teacher.create({
-    teacherName,
-    teacherId,
+    teacherName: userName,
+    teacherId: userId,
     subject,
-    contactNumber,
+    contactNumber: contact,
   });
   //   check for teachers creation
-  const teacher = await Teacher.findOne({ teacherId });
+  const teacher = await Teacher.findOne({ teacherId: userId });
 
   if (!teacher)
     throw new ApiErrors(
@@ -43,9 +43,35 @@ const newTeacher = asyncHandler(async (req, res) => {
     );
 });
 
+const getAllTeachers = asyncHandler(async (req, res) => {
+  const subjects = [
+    "Kannada",
+    "English",
+    "Hindi",
+    "Mathamatics",
+    "Science",
+    "Social Science",
+    "Physical Training",
+    "Arts Education",
+  ];
+  let teachers = [];
+  subjects.forEach(async (subject) => {
+    const teacher = await Teacher.find({ subject });
+    if (teacher[0]) {
+      teachers = [...teachers, ...teacher];
+    }
+  });
+
+  res
+    .status(201)
+    .json(
+      new ApiResponse(201, teachers, "Teachers  data fetched successfully")
+    );
+});
+
 const changeData = asyncHandler(async (req, res) => {
   //get the details from req
-  const { teacherName, teacherId, subject, contactNumber } = req.body;
+  const { userName, userId, subject, contact } = req.body;
 
   const teacher = await Teacher.findById(req.params.id);
   if (!teacher) throw new ApiErrors(400, "Could not find the teachers data");
@@ -53,7 +79,12 @@ const changeData = asyncHandler(async (req, res) => {
   const updatedTecher = await Teacher.findByIdAndUpdate(
     teacher._id,
     {
-      $set: { teacherName, teacherId, subject, contactNumber },
+      $set: {
+        teacherName: userName,
+        teacherId: userId,
+        subject,
+        contactNumber: contact,
+      },
     },
     { new: true }
   );
@@ -94,4 +125,4 @@ const deleteData = asyncHandler(async (req, res) => {
     );
 });
 
-export { newTeacher, changeData, deleteData };
+export { newTeacher, getAllTeachers, changeData, deleteData };

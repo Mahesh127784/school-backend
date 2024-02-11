@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   changeData,
+  getAllStudents,
   deleteData,
   newStudent,
 } from "../controllers/student.controller.js";
@@ -15,6 +16,9 @@ const router = Router();
 router
   .route("/newStudent")
   .post(validateNewStudentData, handleValidationErrors, newStudent);
+
+//get all students data
+router.route("/getAllStudents").get(getAllStudents);
 
 //change students data
 router

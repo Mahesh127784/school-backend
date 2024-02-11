@@ -1,9 +1,12 @@
 import { Router } from "express";
 import {
   newAdmin,
+  changeData,
+  deleteData,
   adminLogin,
   logoutAdmin,
   getCurrentAdmin,
+  getAllAdmins,
 } from "../controllers/admin.controller.js";
 import {
   validateNewAdminData,
@@ -19,6 +22,17 @@ const router = Router();
 router
   .route("/newAdmin")
   .post(validateNewAdminData, handleValidationErrors, newAdmin);
+
+//fetch all admins
+router.route("/getAllAdmins").get(getAllAdmins);
+
+//change admin data
+router
+  .route("/changeData/:id")
+  .put(validateNewAdminData, handleValidationErrors, changeData);
+
+//remove admin
+router.route("/deleteData/:id").delete(deleteData);
 
 //when loggin admin req
 router

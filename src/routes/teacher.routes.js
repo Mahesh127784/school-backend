@@ -6,6 +6,7 @@ import {
 import {
   changeData,
   deleteData,
+  getAllTeachers,
   newTeacher,
 } from "../controllers/teacher.controller.js";
 
@@ -14,6 +15,9 @@ const router = Router();
 router
   .route("/newTeacher")
   .post(validateNewTeacherData, handleValidationErrors, newTeacher);
+
+//get all teachers data
+router.route("/getAllTeachers").get(getAllTeachers);
 
 //change teachers data
 router

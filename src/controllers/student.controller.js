@@ -5,10 +5,10 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 const newStudent = asyncHandler(async (req, res) => {
   //get the details from req
-  const { studentName, studentId, Class, DOB, parentContact } = req.body;
+  const { userName, userId, Class, DOB, contact } = req.body;
 
   //   check if the student id is already aloted
-  const checkId = await Student.findOne({ studentId });
+  const checkId = await Student.findOne({ studentId: userId });
   if (checkId)
     throw new ApiErrors(
       400,
@@ -17,15 +17,15 @@ const newStudent = asyncHandler(async (req, res) => {
 
   //add the students data in DB
   await Student.create({
-    studentName,
-    studentId,
+    studentName: userName,
+    studentId: userId,
     Class,
     DOB,
-    parentContact,
+    parentContact: contact,
   });
 
   //check for student creation
-  const student = await Student.findOne({ studentId });
+  const student = await Student.findOne({ studentId: userId });
   if (!student)
     throw new ApiErrors(
       500,
@@ -43,9 +43,26 @@ const newStudent = asyncHandler(async (req, res) => {
     );
 });
 
+const getAllStudents = asyncHandler(async (req, res) => {
+  const classes = 20;
+  let students = [];
+  for (let i = 1; i <= classes; i++) {
+    const student = await Student.find({ Class: JSON.stringify(i) });
+    if (student[0]) {
+      students = [...students, ...student];
+    }
+  }
+
+  res
+    .status(201)
+    .json(
+      new ApiResponse(201, students, "Students  data fetched successfully")
+    );
+});
+
 const changeData = asyncHandler(async (req, res) => {
   //get the details from req
-  const { studentName, studentId, Class, DOB, parentContact } = req.body;
+  const { userName, userId, Class, DOB, contact } = req.body;
 
   const student = await Student.findById(req.params.id);
   if (!student) throw new ApiErrors(400, "Could not find the Students data");
@@ -53,7 +70,13 @@ const changeData = asyncHandler(async (req, res) => {
   const updatedStudent = await Student.findByIdAndUpdate(
     student._id,
     {
-      $set: { studentName, studentId, Class, DOB, parentContact },
+      $set: {
+        studentName: userName,
+        studentId: userId,
+        Class,
+        DOB,
+        parentContact: contact,
+      },
     },
     { new: true }
   );
@@ -71,7 +94,7 @@ const changeData = asyncHandler(async (req, res) => {
 
 const deleteData = asyncHandler(async (req, res) => {
   const student = await Student.findById(req.params.id);
-  if (!student) throw new ApiErrors(400, "Could not find the students data");
+  if (!student) throw new ApiErrors(404, "Could not find the students data");
 
   //remove the students data
   await Student.findByIdAndDelete(student._id);
@@ -96,4 +119,4 @@ const deleteData = asyncHandler(async (req, res) => {
     );
 });
 
-export { newStudent, changeData, deleteData };
+export { newStudent, getAllStudents, changeData, deleteData };
