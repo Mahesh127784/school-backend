@@ -39,9 +39,7 @@ const admissionFormSchema = new Schema(
     previousSchool: {
       type: String,
     },
-    previousClass: {
-      type: String,
-    },
+
     desiredClass: {
       type: String,
       required: true,

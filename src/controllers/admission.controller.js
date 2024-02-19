@@ -16,13 +16,15 @@ const admissionSubmit = asyncHandler(async (req, res) => {
     guardianName,
     guardianContact,
     previousSchool,
-    previousClass,
     desiredClass,
   } = req.body;
 
+  console.log(req.body);
+  console.log(req.file);
   //get the url of the file which is locally saved by multer
   const file = req.file;
   const previousClassMarkscard = `./public/temp/${file.filename}`;
+
   if (!previousClassMarkscard) throw new ApiErrors(400, "No files added");
 
   //upload the file to cloudinary
@@ -40,7 +42,6 @@ const admissionSubmit = asyncHandler(async (req, res) => {
     guardianName,
     guardianContact,
     previousSchool: previousSchool || "",
-    previousClass: previousClass || "",
     desiredClass,
     previousClassMarkscard: marksCard.secure_url,
   });

@@ -2,17 +2,23 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { Student } from "../models/students.model.js";
 import { ApiErrors } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { Teacher } from "../models/teacher.model.js";
 
 const newStudent = asyncHandler(async (req, res) => {
   //get the details from req
   const { userName, userId, Class, DOB, contact } = req.body;
 
   //   check if the student id is already aloted
-  const checkId = await Student.findOne({ studentId: userId });
-  if (checkId)
+  const checkId1 = await Student.findOne({ studentId: userId });
+  const checkId2 = await Teacher.findOne({ teacherId: userId });
+
+  if (checkId1 || checkId2)
     throw new ApiErrors(
       400,
-      `This studentId is already aloted to ${checkId.studentName} of class ${checkId.Class}`
+      (checkId1 &&
+        `This studentId is already aloted to ${checkId1.studentName} of class ${checkId1.Class}`) ||
+        (checkId2 &&
+          `This studentId is already aloted to teacher ${checkId2.teacherName}  of  ${checkId2.subject} subject`)
     );
 
   //add the students data in DB
@@ -44,10 +50,11 @@ const newStudent = asyncHandler(async (req, res) => {
 });
 
 const getAllStudents = asyncHandler(async (req, res) => {
-  const classes = 20;
+  const classes = 12;
   let students = [];
+
   for (let i = 1; i <= classes; i++) {
-    const student = await Student.find({ Class: JSON.stringify(i) });
+    const student = await Student.find({ Class: i });
     if (student[0]) {
       students = [...students, ...student];
     }

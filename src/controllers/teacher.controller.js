@@ -1,3 +1,4 @@
+import { Student } from "../models/students.model.js";
 import { Teacher } from "../models/teacher.model.js";
 import { ApiErrors } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -8,12 +9,16 @@ const newTeacher = asyncHandler(async (req, res) => {
   const { userName, userId, subject, contact } = req.body;
 
   //   check for teacher id availability
-  const checkId = await Teacher.findOne({ teacherId: userId });
+  const checkId1 = await Student.findOne({ studentId: userId });
+  const checkId2 = await Teacher.findOne({ teacherId: userId });
 
-  if (checkId)
+  if (checkId1 || checkId2)
     throw new ApiErrors(
       400,
-      `This teacherId is already aloted to ${checkId.subject} teacher mr/ms ${checkId.teacherName}`
+      (checkId1 &&
+        `This teacherId is already aloted to ${checkId1.studentName} of class ${checkId1.Class}`) ||
+        (checkId2 &&
+          `This teacherId is already aloted to ${checkId2.subject} teacher mr/ms ${checkId2.teacherName}`)
     );
 
   //add teachers data in db
@@ -54,13 +59,15 @@ const getAllTeachers = asyncHandler(async (req, res) => {
     "Physical Training",
     "Arts Education",
   ];
+
   let teachers = [];
-  subjects.forEach(async (subject) => {
-    const teacher = await Teacher.find({ subject });
+
+  for (let i = 0; i < subjects.length; i++) {
+    const teacher = await Teacher.find({ subject: subjects[i] });
     if (teacher[0]) {
       teachers = [...teachers, ...teacher];
     }
-  });
+  }
 
   res
     .status(201)

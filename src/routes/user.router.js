@@ -15,7 +15,6 @@ import {
   validateLoggingUser,
   handleValidationErrors,
 } from "../middlewares/Validator.middleware.js";
-
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();

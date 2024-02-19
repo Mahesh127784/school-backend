@@ -34,6 +34,7 @@ const registerUser = asyncHandler(async (req, res) => {
     name,
     userId,
     email,
+    user: teacher ? "Teacher" : "Student",
     password,
   });
 

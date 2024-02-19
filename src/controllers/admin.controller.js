@@ -51,12 +51,12 @@ const getAllAdmins = asyncHandler(async (req, res) => {
     "School Assembly Member",
   ];
   let admins = [];
-  works.forEach(async (work) => {
-    const admin = await Admin.find({ work });
+  for (let i = 0; i < works.length; i++) {
+    const admin = await Admin.find({ work: works[i] });
     if (admin[0]) {
-      admins = [...admins, ...admin];
+      admins.push(...admin);
     }
-  });
+  }
 
   res
     .status(201)
