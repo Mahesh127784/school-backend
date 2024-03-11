@@ -5,6 +5,7 @@ import { Teacher } from "../models/teacher.model.js";
 import { ApiErrors } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { AccessAndRefreshTokenGenerator } from "../utils/access&refreshtokens.js";
+import { Admin } from "../models/admin.model.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   //   get user datails from frontEnd
@@ -51,7 +52,7 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, createdUser, "User registered successfully"));
 });
 
-const loginUser = asyncHandler(async (req, res, next) => {
+const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   // find the user in the school Database
@@ -80,34 +81,49 @@ const loginUser = asyncHandler(async (req, res, next) => {
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
+  const message =
+    loggedInUser.user === "Student"
+      ? "Student logged in successfully"
+      : "Teacher logged in successfully";
+
   // some settings for cookies security
   const options = {
     httpOnly: true,
-    security: true,
+    secure: true,
+    sameSite: "strict",
   };
 
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, {
+      ...options,
+      maxAge: 24 * 60 * 60 * 1000,
+    })
+    .cookie("refreshToken", refreshToken, {
+      ...options,
+      maxAge: 10 * 24 * 60 * 60 * 1000,
+    })
     .json(
       new ApiResponse(
         200,
         { user: loggedInUser, accessToken, refreshToken },
-        "User logged in successfully"
+        message
       )
     );
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-  await User.findByIdAndUpdate(
-    req.user._id,
-    {
-      $set: { refreshToken: undefined },
-    },
+  (await req.user.user)
+    ? User
+    : Admin.findByIdAndUpdate(
+        req.user._id,
+        {
+          $set: { refreshToken: undefined },
+        },
 
-    { new: true }
-  );
+        { new: true }
+      );
+
   const options = {
     httpOnly: true,
     secure: true,

@@ -3,11 +3,11 @@ import { ApiErrors } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { AccessAndRefreshTokenGenerator } from "../utils/access&refreshtokens.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const newAdmin = asyncHandler(async (req, res) => {
   //get data from the req
   const { adminName, adminCode, work, email, password } = req.body;
-  console.log(work);
   //check weather adminID and email is already aloted
   const adminC1 = await Admin.findOne({ adminCode });
   if (adminC1)
@@ -22,6 +22,8 @@ const newAdmin = asyncHandler(async (req, res) => {
     work,
     email,
     password,
+    adminImage:
+      "https://t4.ftcdn.net/jpg/05/89/93/27/360_F_589932782_vQAEAZhHnq1QCGu5ikwrYaQD0Mmurm0N.jpg",
   });
 
   //check for admin creation &  remove password and refresh token field from response
@@ -82,7 +84,7 @@ const changeData = asyncHandler(async (req, res) => {
       },
     },
     { new: true }
-  );
+  ).select("-password -refreshToken");
 
   res
     .status(201)
@@ -148,13 +150,20 @@ const adminLogin = asyncHandler(async (req, res) => {
   // some settings for cookies security
   const options = {
     httpOnly: true,
-    security: true,
+    secure: true,
+    sameSite: "strict",
   };
 
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, {
+      ...options,
+      maxAge: 24 * 60 * 60 * 1000,
+    })
+    .cookie("refreshToken", refreshToken, {
+      ...options,
+      maxAge: 10 * 24 * 60 * 60 * 1000,
+    })
     .json(
       new ApiResponse(
         200,
@@ -164,32 +173,55 @@ const adminLogin = asyncHandler(async (req, res) => {
     );
 });
 
-const getCurrentAdmin = asyncHandler((req, res) => {
-  return res
-    .status(200)
-    .json(new ApiResponse(200, req.user, "Current Admin fetched successfully"));
-});
+const adminImage = asyncHandler(async (req, res) => {
+  const file = req.file;
+  if (!file) {
+    throw new ApiErrors(400, "Select an image to upload");
+  }
+  const adminImage = `./public/temp/${file.filename}`;
+  if (!adminImage) {
+    throw new ApiErrors(400, "No files added");
+  }
+  const picture = await uploadOnCloudinary(adminImage);
+  if (!picture) {
+    throw new ApiErrors(400, "No files added");
+  }
 
-const logoutAdmin = asyncHandler(async (req, res) => {
-  await Admin.findByIdAndUpdate(
+  const user = await Admin.findByIdAndUpdate(
     req.user._id,
     {
-      $set: { refreshToken: undefined },
+      $set: {
+        adminImage: picture.secure_url,
+      },
     },
-
     { new: true }
-  );
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
+  ).select("-password -refreshToken");
 
-  return res
+  res
     .status(200)
-    .clearCookie("refreshToken", options)
-    .clearCookie("accessToken", options)
-    .json(new ApiResponse(200, {}, "Admin logged out"));
+    .json(new ApiResponse(200, user, "Your image uploaded succcessfully"));
 });
+
+// const logoutAdmin = asyncHandler(async (req, res) => {
+//   await Admin.findByIdAndUpdate(
+//     req.user._id,
+//     {
+//       $set: { refreshToken: undefined },
+//     },
+
+//     { new: true }
+//   );
+//   const options = {
+//     httpOnly: true,
+//     secure: true,
+//   };
+
+//   return res
+//     .status(200)
+//     .clearCookie("refreshToken", options)
+//     .clearCookie("accessToken", options)
+//     .json(new ApiResponse(200, {}, "Admin logged out"));
+// });
 
 export {
   newAdmin,
@@ -197,6 +229,6 @@ export {
   deleteData,
   getAllAdmins,
   adminLogin,
-  getCurrentAdmin,
-  logoutAdmin,
+  adminImage,
+  // logoutAdmin,
 };

@@ -4,9 +4,10 @@ import {
   changeData,
   deleteData,
   adminLogin,
-  logoutAdmin,
-  getCurrentAdmin,
+  // logoutAdmin,
+  // getCurrentAdmin,
   getAllAdmins,
+  adminImage,
 } from "../controllers/admin.controller.js";
 import {
   validateNewAdminData,
@@ -15,6 +16,7 @@ import {
 } from "../middlewares/Validator.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { tokensRenewer } from "../utils/access&refreshtokens.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
@@ -24,7 +26,7 @@ router
   .post(validateNewAdminData, handleValidationErrors, newAdmin);
 
 //fetch all admins
-router.route("/getAllAdmins").get(getAllAdmins);
+router.route("/getAllUsers").get(getAllAdmins);
 
 //change admin data
 router
@@ -39,13 +41,15 @@ router
   .route("/adminLogin")
   .post(validateLoginAdminData, handleValidationErrors, adminLogin);
 
-//get the admin after login to get their data
-router.route("/getCurrentAdmin").post(verifyJWT, getCurrentAdmin);
-
 //if access token expired
 router.route("/tokensRenew").post(tokensRenewer);
 
+//admin adds profile pictures
+router.route("/userImage").post(verifyJWT, upload.single("file"), adminImage);
+
+//get the admin after login to get their data
+// router.route("/getCurrentAdmin").post(verifyJWT, getCurrentAdmin);
 //when logout admin req
-router.route("/adminLogout").post(verifyJWT, logoutAdmin);
+// router.route("/adminLogout").post(verifyJWT, logoutAdmin);
 
 export default router;

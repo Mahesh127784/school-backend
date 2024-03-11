@@ -17,7 +17,7 @@ router
   .post(validateNewTeacherData, handleValidationErrors, newTeacher);
 
 //get all teachers data
-router.route("/getAllTeachers").get(getAllTeachers);
+router.route("/getAllUsers").get(getAllTeachers);
 
 //change teachers data
 router

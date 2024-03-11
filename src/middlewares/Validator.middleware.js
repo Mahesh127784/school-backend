@@ -77,9 +77,8 @@ const validateAdmissionForm = [
     .optional()
     .isLength({ min: 1 }),
   body("desiredClass", "Enter a valid desired class").isLength({ min: 1 }),
-  // body("previousClassMarkscard", "Add a file").notEmpty(),
+  body("previousClassMarkscard", "Add a file").notEmpty(),
 ];
-
 // check for the validation error
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);

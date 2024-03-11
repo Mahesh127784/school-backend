@@ -6,15 +6,14 @@ import { asyncHandler } from "./asyncHandler.js";
 import { ApiResponse } from "./ApiResponse.js";
 
 // AccessAndRefreshTokenGenerator
-const AccessAndRefreshTokenGenerator = async (user1) => {
+const AccessAndRefreshTokenGenerator = async (userData) => {
   let user;
-  user = await Admin.findById(user1._id);
-  if (!user) user = await User.findById(user1._id);
+  user = await Admin.findById(userData._id);
+  if (!user) user = await User.findById(userData._id);
   try {
     const accessToken = await user.generateAccessToken();
     const refreshToken = await user.generateRefreshToken();
-    console.log(accessToken);
-    console.log(refreshToken);
+
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
@@ -30,6 +29,7 @@ const AccessAndRefreshTokenGenerator = async (user1) => {
 // AccessAndRefreshToken renewer
 const tokensRenewer = asyncHandler(async (req, res) => {
   // get the refreshToken from the user
+
   const usersRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
   if (!usersRefreshToken) throw new ApiErrors(401, "unautherized request");
@@ -51,18 +51,25 @@ const tokensRenewer = asyncHandler(async (req, res) => {
 
   //create new tokens as the user is autherized
   const { accessToken, refreshToken } = await AccessAndRefreshTokenGenerator(
-    user._id
+    user
   );
 
   const options = {
     httpOnly: true,
-    security: true,
+    secure: true,
+    sameSite: "strict",
   };
 
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, {
+      ...options,
+      maxAge: 24 * 60 * 60 * 1000,
+    })
+    .cookie("refreshToken", refreshToken, {
+      ...options,
+      maxAge: 10 * 24 * 60 * 60 * 1000,
+    })
     .json(
       new ApiResponse(
         200,

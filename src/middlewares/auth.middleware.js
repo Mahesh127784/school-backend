@@ -9,6 +9,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
   const token =
     req.cookies?.accessToken ||
     req.header("Authorization")?.replace("Bearer", "");
+
   if (!token) throw new ApiErrors(401, "Unautherized request");
 
   // verify the Accesstoken with our Accesstoken secret to get the data of the user we added in it
@@ -25,7 +26,6 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     );
 
   if (!user) throw new ApiErrors(401, "Invalid accessToken");
-
   //adding the userDetails object to request so that use it when we need
   req.user = user;
   next();

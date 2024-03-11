@@ -19,10 +19,12 @@ const admissionSubmit = asyncHandler(async (req, res) => {
     desiredClass,
   } = req.body;
 
-  console.log(req.body);
-  console.log(req.file);
   //get the url of the file which is locally saved by multer
   const file = req.file;
+  if (!file) {
+    throw new ApiErrors(400, "Select your markscard to upload");
+  }
+  c;
   const previousClassMarkscard = `./public/temp/${file.filename}`;
 
   if (!previousClassMarkscard) throw new ApiErrors(400, "No files added");

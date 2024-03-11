@@ -13,22 +13,21 @@ const adminSchema = new Schema(
       type: Number,
       required: true,
     },
-    work: {
-      type: String,
-      required: true,
-    },
     email: {
       type: String,
       required: true,
       unique: true,
     },
+    work: {
+      type: String,
+      required: true,
+    },
     password: {
       type: String,
       required: true,
     },
-    refreshToken: {
-      type: String,
-    },
+    adminImage: { type: String },
+    refreshToken: { type: String },
   },
   {
     timestamps: true,
