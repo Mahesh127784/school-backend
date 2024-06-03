@@ -6,6 +6,7 @@ import {
   registerUser,
   changeCurrentPassword,
   getCurrentUser,
+  userImage,
 } from "../controllers/user.controller.js";
 
 import { tokensRenewer } from "../utils/access&refreshtokens.js";
@@ -16,6 +17,7 @@ import {
   handleValidationErrors,
 } from "../middlewares/Validator.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
@@ -40,5 +42,8 @@ router.route("/logout").post(verifyJWT, logoutUser);
 
 //when user want to change password
 router.route("/changeCurrentPassword").put(verifyJWT, changeCurrentPassword);
+
+//user adds profile pictures
+router.route("/userImage").post(verifyJWT, upload.single("file"), userImage);
 
 export default router;

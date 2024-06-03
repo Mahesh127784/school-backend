@@ -6,7 +6,19 @@ import { Teacher } from "../models/teacher.model.js";
 
 const newStudent = asyncHandler(async (req, res) => {
   //get the details from req
-  const { userName, userId, Class, DOB, contact } = req.body;
+  const {
+    firstName,
+    lastName,
+    address,
+    guardianName,
+    guardianPhone,
+    enrollmentDate,
+    section,
+    userId,
+    Class,
+    DOB,
+    contact,
+  } = req.body;
 
   //   check if the student id is already aloted
   const checkId1 = await Student.findOne({ studentId: userId });
@@ -23,11 +35,16 @@ const newStudent = asyncHandler(async (req, res) => {
 
   //add the students data in DB
   await Student.create({
-    studentName: userName,
+    address,
+    guardianName,
+    guardianPhone,
+    enrollmentDate,
+    section,
+    contact,
+    studentName: firstName + " " + lastName,
     studentId: userId,
     Class,
     DOB,
-    parentContact: contact,
   });
 
   //check for student creation
@@ -69,20 +86,49 @@ const getAllStudents = asyncHandler(async (req, res) => {
 
 const changeData = asyncHandler(async (req, res) => {
   //get the details from req
-  const { userName, userId, Class, DOB, contact } = req.body;
+  const {
+    firstName,
+    lastName,
+    address,
+    guardianName,
+    guardianPhone,
+    enrollmentDate,
+    section,
+    userId,
+    Class,
+    DOB,
+    contact,
+  } = req.body;
 
   const student = await Student.findById(req.params.id);
   if (!student) throw new ApiErrors(400, "Could not find the Students data");
+
+  //   check if the student id is already aloted
+  const checkId1 = await Student.findOne({ studentId: userId });
+  const checkId2 = await Teacher.findOne({ teacherId: userId });
+
+  if (checkId2 || (checkId1 && student.studentId !== Number(userId)))
+    throw new ApiErrors(
+      400,
+      checkId1
+        ? `This studentId is already aloted to ${checkId1.studentName} of class ${checkId1.Class}`
+        : `This studentId is already aloted to teacher ${checkId2.teacherName}  of  ${checkId2.subject} subject`
+    );
 
   const updatedStudent = await Student.findByIdAndUpdate(
     student._id,
     {
       $set: {
-        studentName: userName,
+        address,
+        guardianName,
+        guardianPhone,
+        enrollmentDate,
+        section,
+        contact,
+        studentName: firstName + " " + lastName,
         studentId: userId,
         Class,
         DOB,
-        parentContact: contact,
       },
     },
     { new: true }

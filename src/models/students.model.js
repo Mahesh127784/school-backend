@@ -12,7 +12,27 @@ const studentSchema = new Schema(
       required: true,
       index: true,
     },
+    contact: {
+      type: Number,
+    },
+    address: {
+      type: String,
+      required: true,
+    },
+    guardianName: {
+      type: String,
+      required: true,
+    },
+    guardianPhone: {
+      type: Number,
+      required: true,
+    },
     Class: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    section: {
       type: String,
       required: true,
       index: true,
@@ -21,8 +41,8 @@ const studentSchema = new Schema(
       type: Date,
       required: true,
     },
-    parentContact: {
-      type: Number,
+    enrollmentDate: {
+      type: Date,
       required: true,
     },
   },

@@ -6,7 +6,21 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 
 const newTeacher = asyncHandler(async (req, res) => {
   // get data from req
-  const { userName, userId, subject, contact } = req.body;
+  const {
+    firstName,
+    lastName,
+    email,
+    address,
+    DOB,
+    university,
+    degree,
+    city,
+    startDate,
+    endDate,
+    subject,
+    contact,
+    userId,
+  } = req.body;
 
   //   check for teacher id availability
   const checkId1 = await Student.findOne({ studentId: userId });
@@ -23,10 +37,18 @@ const newTeacher = asyncHandler(async (req, res) => {
 
   //add teachers data in db
   await Teacher.create({
-    teacherName: userName,
+    teacherName: firstName + " " + lastName,
     teacherId: userId,
+    email,
+    address,
+    DOB,
+    university,
+    degree,
+    city,
+    startDate,
+    endDate,
     subject,
-    contactNumber: contact,
+    contact,
   });
   //   check for teachers creation
   const teacher = await Teacher.findOne({ teacherId: userId });
@@ -78,19 +100,53 @@ const getAllTeachers = asyncHandler(async (req, res) => {
 
 const changeData = asyncHandler(async (req, res) => {
   //get the details from req
-  const { userName, userId, subject, contact } = req.body;
+  const {
+    firstName,
+    lastName,
+    email,
+    address,
+    DOB,
+    university,
+    degree,
+    city,
+    startDate,
+    endDate,
+    subject,
+    contact,
+    userId,
+  } = req.body;
 
   const teacher = await Teacher.findById(req.params.id);
   if (!teacher) throw new ApiErrors(400, "Could not find the teachers data");
+
+  //   check for teacher id availability
+  const checkId1 = await Student.findOne({ studentId: userId });
+  const checkId2 = await Teacher.findOne({ teacherId: userId });
+
+  if (checkId1 || (checkId2 && teacher.teacherId !== Number(userId)))
+    throw new ApiErrors(
+      400,
+      checkId1
+        ? `This teacherId is already aloted to ${checkId1.studentName} of class ${checkId1.Class}`
+        : `This teacherId is already aloted to ${checkId2.subject} teacher mr/ms ${checkId2.teacherName}`
+    );
 
   const updatedTecher = await Teacher.findByIdAndUpdate(
     teacher._id,
     {
       $set: {
-        teacherName: userName,
+        teacherName: firstName + " " + lastName,
         teacherId: userId,
+        email,
+        address,
+        DOB,
+        university,
+        degree,
+        city,
+        startDate,
+        endDate,
         subject,
-        contactNumber: contact,
+        contact,
       },
     },
     { new: true }

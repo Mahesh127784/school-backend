@@ -9,6 +9,7 @@ const userSchema = new Schema(
       required: true,
       index: true,
     },
+    user: { type: String, required: true },
     userId: {
       type: Number,
       required: true,
@@ -19,8 +20,11 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
-    user: { type: String, required: true },
     password: {
+      type: String,
+      required: true,
+    },
+    about: {
       type: String,
       required: true,
     },

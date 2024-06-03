@@ -7,6 +7,10 @@ const teacherSchema = new Schema(
       required: true,
       index: true,
     },
+    email: {
+      type: String,
+      required: true,
+    },
     teacherId: {
       type: Number,
       required: true,
@@ -16,8 +20,37 @@ const teacherSchema = new Schema(
       required: true,
       index: true,
     },
-    contactNumber: {
+    address: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    DOB: {
+      type: Date,
+      required: true,
+    },
+    contact: {
       type: Number,
+      required: true,
+    },
+    university: {
+      type: String,
+      required: true,
+    },
+    degree: {
+      type: String,
+      required: true,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    startDate: {
+      type: Date,
+      required: true,
+    },
+    endDate: {
+      type: Date,
       required: true,
     },
   },

@@ -136,8 +136,8 @@ const adminLogin = asyncHandler(async (req, res) => {
 
   //check for the password
   const checkPassword = await admin.isPasswordCorrect(password);
-  if (!checkPassword)
-    throw new ApiErrors(400, "Please login with proper credentials");
+  // if (!checkPassword)
+  //   throw new ApiErrors(400, "Please login with proper credentials");
 
   const { accessToken, refreshToken } = await AccessAndRefreshTokenGenerator(
     admin

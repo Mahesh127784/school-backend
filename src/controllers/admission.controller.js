@@ -7,7 +7,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 const admissionSubmit = asyncHandler(async (req, res) => {
   //get the details from req
   const {
-    studentName,
+    firstName,
+    lastName,
     DOB,
     gender,
     address,
@@ -18,13 +19,13 @@ const admissionSubmit = asyncHandler(async (req, res) => {
     previousSchool,
     desiredClass,
   } = req.body;
+  const file = req.file;
 
   //get the url of the file which is locally saved by multer
-  const file = req.file;
   if (!file) {
     throw new ApiErrors(400, "Select your markscard to upload");
   }
-  c;
+
   const previousClassMarkscard = `./public/temp/${file.filename}`;
 
   if (!previousClassMarkscard) throw new ApiErrors(400, "No files added");
@@ -35,7 +36,7 @@ const admissionSubmit = asyncHandler(async (req, res) => {
 
   // add the form in db
   const admissionForm = new AdmissionForm({
-    studentName,
+    studentName: firstName + "" + lastName,
     DOB,
     gender,
     address,
@@ -43,7 +44,7 @@ const admissionSubmit = asyncHandler(async (req, res) => {
     email,
     guardianName,
     guardianContact,
-    previousSchool: previousSchool || "",
+    previousSchool,
     desiredClass,
     previousClassMarkscard: marksCard.secure_url,
   });
