@@ -74,12 +74,11 @@ const loginUser = asyncHandler(async (req, res) => {
 
   //  check the user is added right password
   const checkPassword = await user.isPasswordCorrect(password);
-  // console.log(checkPassword);
-  if (!checkPassword)
-    throw new ApiErrors(
-      400,
-      "Invalid email or password,Please login with proper credentials"
-    );
+  // if (!checkPassword)
+  //   throw new ApiErrors(
+  //     400,
+  //     "Invalid email or password,Please login with proper credentials"
+  //   );
 
   //  get the access and refresh tokens
   const { accessToken, refreshToken } = await AccessAndRefreshTokenGenerator(
@@ -90,10 +89,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
-  const message =
-    loggedInUser.user === "Student"
-      ? "Student logged in successfully"
-      : "Teacher logged in successfully";
+  const message = "Logged in successfully";
 
   // some settings for cookies security
   const options = {
@@ -177,7 +173,6 @@ const userImage = asyncHandler(async (req, res) => {
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   // get the passwords from user
   const { currentPassword, newPassword } = req.body;
-  console.log(newPassword.length, 8, 15);
 
   if (newPassword.length < 8 || newPassword.length > 15)
     throw new ApiErrors(

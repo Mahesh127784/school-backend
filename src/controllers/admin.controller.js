@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { AccessAndRefreshTokenGenerator } from "../utils/access&refreshtokens.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import bcrypt from "bcrypt";
 
 const newAdmin = asyncHandler(async (req, res) => {
   //get data from the req
@@ -72,6 +73,9 @@ const changeData = asyncHandler(async (req, res) => {
   const admin = await Admin.findById(req.params.id);
   if (!admin) throw new ApiErrors(400, "Could not find the admin data");
 
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
   const updatedAdmin = await Admin.findByIdAndUpdate(
     admin._id,
     {
@@ -80,7 +84,7 @@ const changeData = asyncHandler(async (req, res) => {
         adminCode,
         work,
         email,
-        password,
+        password: hashedPassword,
       },
     },
     { new: true }
@@ -136,8 +140,8 @@ const adminLogin = asyncHandler(async (req, res) => {
 
   //check for the password
   const checkPassword = await admin.isPasswordCorrect(password);
-  // if (!checkPassword)
-  //   throw new ApiErrors(400, "Please login with proper credentials");
+  if (!checkPassword)
+    throw new ApiErrors(400, "Please login with proper credentials");
 
   const { accessToken, refreshToken } = await AccessAndRefreshTokenGenerator(
     admin
