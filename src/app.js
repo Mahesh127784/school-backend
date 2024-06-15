@@ -31,4 +31,8 @@ app.use("/api/v1/teachers", teacherRouter);
 import studentRouter from "./routes/student.router.js";
 app.use("/api/v1/students", studentRouter);
 
+app.get("/api/v1/reurnsuccess", (req, res) => {
+  res.send("successfull");
+});
+
 export default app;
