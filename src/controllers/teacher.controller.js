@@ -115,4 +115,4 @@ const deleteData = asyncHandler(async (req, res) => {
     );
 });
 
-export { newTeacher, changeData, deleteData };
+export { newTeacher, getAllTeachers, changeData, deleteData };
