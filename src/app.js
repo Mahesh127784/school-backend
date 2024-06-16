@@ -35,4 +35,8 @@ app.get("/api/v1/reurnsuccess", (req, res) => {
   res.send("successfull");
 });
 
+app.get("/", (req, res) => {
+  res.send("Welcome to School Administration Backend!.");
+});
+
 export default app;
