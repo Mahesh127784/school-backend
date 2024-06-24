@@ -17,23 +17,25 @@ app.use(cookieParser()); //to access/set cookies from/in users browser
 
 // routes import and declaration / available routes
 import adminRouter from "./routes/admin.router.js";
-app.use("/api/v1/admins", adminRouter);
+// app.use("/api/v1/admins", adminRouter);
 
-import userRouter from "./routes/user.router.js";
-app.use("/api/v1/users", userRouter);
+// import userRouter from "./routes/user.router.js";
+// app.use("/api/v1/users", userRouter);
 
-import admissionRouter from "./routes/admission.router.js";
-app.use("/api/v1/admissions", admissionRouter);
+// import admissionRouter from "./routes/admission.router.js";
+// app.use("/api/v1/admissions", admissionRouter);
 
-import teacherRouter from "./routes/teacher.routes.js";
-app.use("/api/v1/teachers", teacherRouter);
+// import teacherRouter from "./routes/teacher.routes.js";
+// app.use("/api/v1/teachers", teacherRouter);
 
-import studentRouter from "./routes/student.router.js";
-app.use("/api/v1/students", studentRouter);
+// import studentRouter from "./routes/student.router.js";
+// app.use("/api/v1/students", studentRouter);
 
 app.get("/api/v1/reurnsuccess", (req, res) => {
   res.send("successfull");
 });
+
+app.use("/admin", adminRouter);
 
 app.get("/", async (req, res) => {
   res.status(200).send("School Administration Runnding Successfully");
