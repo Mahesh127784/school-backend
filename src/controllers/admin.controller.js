@@ -1,10 +1,11 @@
 import { Admin } from "../models/admin.model.js";
-import { ApiErrors } from "../utils/ApiErrors.js";
+// import { ApiErrors } from "../utils/ApiErrors.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { AccessAndRefreshTokenGenerator } from "../utils/access&refreshtokens.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import bcrypt from "bcrypt";
+import { ApiErrors } from "../utils/ApiErrors.js";
 
 const newAdmin = asyncHandler(async (req, res) => {
   //get data from the req
