@@ -1,6 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { getAllStudents } from "./controllers/student.js";
 
 const app = express();
 
@@ -34,8 +35,7 @@ app.use(cookieParser()); //to access/set cookies from/in users browser
 app.get("/api/v1/reurnsuccess", (req, res) => {
   res.send("successfull");
 });
-
-// app.use("/admin", adminRouter);
+app.get("/getAllStudents", getAllStudents);
 
 app.get("/", (req, res) => {
   res.status(200).send("School Administration Runnding Successfully");
