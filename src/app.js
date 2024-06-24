@@ -35,9 +35,9 @@ app.get("/api/v1/reurnsuccess", (req, res) => {
   res.send("successfull");
 });
 
-app.use("/admin", adminRouter);
+// app.use("/admin", adminRouter);
 
-app.get("/", async (req, res) => {
+app.get("/", (req, res) => {
   res.status(200).send("School Administration Runnding Successfully");
 });
 
